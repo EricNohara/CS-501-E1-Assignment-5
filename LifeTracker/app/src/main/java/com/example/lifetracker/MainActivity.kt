@@ -4,44 +4,25 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.lifetracker.ui.theme.LifeTrackerTheme
+import androidx.activity.viewModels
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: LifeTrackerViewModel by viewModels()
+
+    // lifecycle observer that logs events to the view model
+    private lateinit var logger: LifeCycleLogger
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // create a logger observing lifecycle events and register it as a lifecycle observer so it receives callbacks
+        logger = LifeCycleLogger(viewModel)
+        lifecycle.addObserver(logger)
+
+        // set the UI content to our screen
         setContent {
-            LifeTrackerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            LifeTrackerScreen(viewModel)
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LifeTrackerTheme {
-        Greeting("Android")
     }
 }
